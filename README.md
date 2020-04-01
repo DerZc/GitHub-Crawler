@@ -10,5 +10,10 @@ The GitHub API limits the queries to get 100 elements per page and up to 1,000 e
 NOTE: please, take a look at the GitHub website to be sure that you do not violate any GitHub rule.
 
 ## Dependency
+The Dependency you need include:
+
 wget
+
 simplejson
+
+You need to specify OUTPUT_FOLDER and OUTPUT_TXT_FILE in getDataFromGithub.py
