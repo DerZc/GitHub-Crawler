@@ -35,12 +35,12 @@ except ImportError:
 
 URL = "https://api.github.com/search/repositories?q=" #The basic URL to use the GitHub API
 QUERY = "user:DerZc+" #The personalized query (for instance, to get repositories from user 'rsain')
-#SUBQUERIES = ["language%3AC+language%3AC%2B%2B+stars%3A>50"] #Different subqueries if you need to collect more than 1000 elements
-SUBQUERIES = ["language:C+language:cpp+stars:>=50"]
+SUBQUERIES = ["language:C+language:cpp+stars:>=50"] #Different subqueries if you need to collect more than 1000 elements
 PARAMETERS = "&per_page=100" #Additional parameters for the query (by default 100 items per page)
 DELAY_BETWEEN_QUERYS = 10 #The time to wait between different queries to GitHub (to avoid be banned)
 OUTPUT_FOLDER = "/home/zhangchi/Github-C/" #Folder where ZIP files will be stored
-OUTPUT_TXT_FILE = "/home/zhangchi/Github-C/" #Path to the CSV file generated as output
+OUTPUT_TXT_FILE = "/home/zhangchi/Github-C/" #Path to the txt file generated as output
+MINIMUM_PROJECT_NUM = 1000 #The minimum num of projects
 
 
 #############
@@ -64,74 +64,94 @@ def getUrl (url) :
 # MAIN #
 ########
 
-#To save the number of repositories processed
-countOfRepositories = 0
+def downProj ():
+	#To save the number of repositories processed
+	countOfRepositories = 0
 
-#Output CSV file which will contain information about repositories
-f = open(OUTPUT_TXT_FILE + "repositories.txt", "a+")
+	#Output CSV file which will contain information about repositories
+	f = open(OUTPUT_TXT_FILE + "repositories.txt", "a+")
 
-#Run queries to get information in json format and download ZIP file for each repository
-for subquery in range(1, len(SUBQUERIES)+1):
-	#print "Processing subquery " + str(subquery) + " of " + str(len(SUBQUERIES)) + " ..."
-	print("Processing subquery %d of %d ..." %(subquery, len(SUBQUERIES)))
+	#Run queries to get information in json format and download ZIP file for each repository
+	for subquery in range(1, len(SUBQUERIES)+1):
+		#print "Processing subquery " + str(subquery) + " of " + str(len(SUBQUERIES)) + " ..."
+		print("Processing subquery %d of %d ..." %(subquery, len(SUBQUERIES)))
 	
-	#Obtain the number of pages for the current subquery (by default each page contains 100 items)
-	#url = URL + QUERY + str(SUBQUERIES[subquery-1]) + PARAMETERS			
-	url = URL + str(SUBQUERIES[subquery-1]) + PARAMETERS	
+		#Obtain the number of pages for the current subquery (by default each page contains 100 items)
+		#url = URL + QUERY + str(SUBQUERIES[subquery-1]) + PARAMETERS			
+		url = URL + str(SUBQUERIES[subquery-1]) + PARAMETERS	
 
-	print("query url: ", url)
-	dataRead = simplejson.loads(getUrl(url))	
-	numberOfPages = int(math.ceil(dataRead.get('total_count')/100.0))
+		print("query url: ", url)
+		try:
+			dataRead = simplejson.loads(getUrl(url))	
+		except Exception as e:
+			print(e)
+			time.sleep(DELAY_BETWEEN_QUERYS)
+			return 1
+		numberOfPages = int(math.ceil(dataRead.get('total_count')/100.0))
 
-	#Results are in different pages
-	for currentPage in range(1, numberOfPages+1):
-		#print "Processing page " + str(currentPage) + " of " + str(numberOfPages) + " ..."
-		print("Processing page %d of %d ..." %(currentPage, numberOfPages))
-		#url = URL + QUERY + str(SUBQUERIES[subquery-1]) + PARAMETERS + "&page=" + str(currentPage)	
-		url = URL + str(SUBQUERIES[subquery-1]) + PARAMETERS + "&page=" + str(currentPage)
-		print("current page url: ", url)
-		dataRead = simplejson.loads(getUrl(url))
-		
-		#Iteration over all the repositories in the current json content page
-		for item in dataRead['items']:
-			#Obtain user and repository names
-			user = item['owner']['login']
-			repository = item['name']
-			f.write("user: " + user + "; repository: " + repository + "\n")
-			print(user, ' ', repository)
-			
-			#Download the zip file of the current project				
-			print ("Downloading repository '%s' from user '%s' ..." %(repository,user))
-			url = item['clone_url']
-			fileToDownload = url[0:len(url)-4] + "/archive/master.zip"
-			fileName = item['full_name'].replace("/","#") + ".zip"
-
-			if os.path.exists(OUTPUT_FOLDER + fileName):
-				continue
-				
-			print("download url: " + fileToDownload)
-
+		#Results are in different pages
+		for currentPage in range(1, numberOfPages+1):
+			#print "Processing page " + str(currentPage) + " of " + str(numberOfPages) + " ..."
+			print("Processing page %d of %d ..." %(currentPage, numberOfPages))
+			#url = URL + QUERY + str(SUBQUERIES[subquery-1]) + PARAMETERS + "&page=" + str(currentPage)	
+			url = URL + str(SUBQUERIES[subquery-1]) + PARAMETERS + "&page=" + str(currentPage)
+			print("current page url: ", url)
 			try:
-				wget.download(fileToDownload, out=OUTPUT_FOLDER + fileName)
-			except:
-				#https://github.com/antirez/redis/archive/unstable.zip
+				dataRead = simplejson.loads(getUrl(url))
+			except Exception as e:
+				print(e)
+				if countOfRepositories > MINIMUM_PROJECT_NUM:
+					return 0
+				else:
+					time.sleep(DELAY_BETWEEN_QUERYS)
+					return 1
+		
+			#Iteration over all the repositories in the current json content page
+			for item in dataRead['items']:
+				#Obtain user and repository names
+				user = item['owner']['login']
+				repository = item['name']
+				f.write("user: " + user + "; repository: " + repository + "\n")
+				print(user, ' ', repository)
+			
+				#Download the zip file of the current project				
+				print ("Downloading repository '%s' from user '%s' ..." %(repository,user))
+				url = item['clone_url']
+				fileToDownload = url[0:len(url)-4] + "/archive/master.zip"
+				fileName = item['full_name'].replace("/","#") + ".zip"
+
+				if os.path.exists(OUTPUT_FOLDER + fileName):
+					countOfRepositories = countOfRepositories + 1
+					continue
+
+				print("download url: " + fileToDownload)
+
 				try:
-					fileToDownload = url[0:len(url)-4] + "/archive/unstable.zip"
 					wget.download(fileToDownload, out=OUTPUT_FOLDER + fileName)
-				except Exception as e:
-					ef = open(OUTPUT_TXT_FILE + "error.txt", "a+")
-					ef.write(e)
-					ef.close()
+				except:
+					#https://github.com/antirez/redis/archive/unstable.zip
+					try:
+						fileToDownload = url[0:len(url)-4] + "/archive/unstable.zip"
+						wget.download(fileToDownload, out=OUTPUT_FOLDER + fileName)
+					except Exception as e:
+						ef = open(OUTPUT_TXT_FILE + "error.txt", "a+")
+						ef.write(e)
+						ef.close()
 							
-			#Update repositories counter
-			countOfRepositories = countOfRepositories + 1
+				#Update repositories counter
+				countOfRepositories = countOfRepositories + 1
 
-	#A delay between different subqueries
-	if (subquery < len(SUBQUERIES)):
-		#print "Sleeping " + str(DELAY_BETWEEN_QUERYS) + " seconds before the new query ..."
-		print("Sleeping %d seconds before the new query ..." %DELAY_BETWEEN_QUERYS)
-		time.sleep(DELAY_BETWEEN_QUERYS)
+		#A delay between different subqueries
+		if (subquery < len(SUBQUERIES)):
+			#print "Sleeping " + str(DELAY_BETWEEN_QUERYS) + " seconds before the new query ..."
+			print("Sleeping %d seconds before the new query ..." %DELAY_BETWEEN_QUERYS)
+			time.sleep(DELAY_BETWEEN_QUERYS)
 
-#print "DONE! " + str(countOfRepositories) + " repositories have been processed."
-print("DONE! %d repositories have been processed." %countOfRepositories)
-f.close()
+	#print "DONE! " + str(countOfRepositories) + " repositories have been processed."
+	print("DONE! %d repositories have been processed." %countOfRepositories)
+	f.close()
+	return 0
+
+res = 1
+while res:
+	res = downProj()
