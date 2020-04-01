@@ -19,6 +19,7 @@ import time
 import simplejson
 import pycurl
 import math
+import os
 
 try:
     # Python 3
@@ -35,7 +36,7 @@ except ImportError:
 URL = "https://api.github.com/search/repositories?q=" #The basic URL to use the GitHub API
 QUERY = "user:DerZc+" #The personalized query (for instance, to get repositories from user 'rsain')
 #SUBQUERIES = ["language%3AC+language%3AC%2B%2B+stars%3A>50"] #Different subqueries if you need to collect more than 1000 elements
-SUBQUERIES = ["language:C+stars:>=50","language:cpp+stars:>=50"]
+SUBQUERIES = ["language:C+language:cpp+stars:>=50"]
 PARAMETERS = "&per_page=100" #Additional parameters for the query (by default 100 items per page)
 DELAY_BETWEEN_QUERYS = 10 #The time to wait between different queries to GitHub (to avoid be banned)
 OUTPUT_FOLDER = "/home/zhangchi/Github-C/" #Folder where ZIP files will be stored
@@ -104,13 +105,19 @@ for subquery in range(1, len(SUBQUERIES)+1):
 			url = item['clone_url']
 			fileToDownload = url[0:len(url)-4] + "/archive/master.zip"
 			fileName = item['full_name'].replace("/","#") + ".zip"
+
+			if os.path.exists(OUTPUT_FOLDER + fileName):
+				continue
+				
 			print("download url: " + fileToDownload)
+
 			try:
 				wget.download(fileToDownload, out=OUTPUT_FOLDER + fileName)
 			except:
 				#https://github.com/antirez/redis/archive/unstable.zip
 				try:
 					fileToDownload = url[0:len(url)-4] + "/archive/unstable.zip"
+					wget.download(fileToDownload, out=OUTPUT_FOLDER + fileName)
 				except Exception as e:
 					ef = open(OUTPUT_TXT_FILE + "error.txt", "a+")
 					ef.write(e)
