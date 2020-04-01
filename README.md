@@ -14,4 +14,5 @@ The Dependency you need include:
 wget  
 simplejson
 
-You need to specify OUTPUT_FOLDER and OUTPUT_TXT_FILE in getDataFromGithub.py
+You need to specify OUTPUT_FOLDER and OUTPUT_TXT_FILE in getDataFromGithub.py  
+The MINIMUM_PROJECT_NUM is the minimum project num
