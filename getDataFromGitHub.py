@@ -20,7 +20,7 @@ import simplejson
 import csv
 import pycurl
 import math
-from StringIO import StringIO
+import io
 
 
 #############
@@ -28,12 +28,12 @@ from StringIO import StringIO
 #############
 
 URL = "https://api.github.com/search/repositories?q=" #The basic URL to use the GitHub API
-QUERY = "user:rsain" #The personalized query (for instance, to get repositories from user 'rsain')
-SUBQUERIES = ["+created%3A<%3D2013-12-30","+created%3A>%3D2014-01-01"] #Different subqueries if you need to collect more than 1000 elements
+QUERY = "user:DerZc" #The personalized query (for instance, to get repositories from user 'rsain')
+SUBQUERIES = ["+language%3AC+language%3AC%2B%2B+stars%3A>50"] #Different subqueries if you need to collect more than 1000 elements
 PARAMETERS = "&per_page=100" #Additional parameters for the query (by default 100 items per page)
 DELAY_BETWEEN_QUERYS = 10 #The time to wait between different queries to GitHub (to avoid be banned)
-OUTPUT_FOLDER = "/media/ruben/mydisk/Documents/PhD/Energy/Nexus4/Dictionaries/Apps/test/zips/" #Folder where ZIP files will be stored
-OUTPUT_CSV_FILE = "/media/ruben/mydisk/Documents/PhD/Energy/Nexus4/Dictionaries/Apps/test/repositories.csv" #Path to the CSV file generated as output
+OUTPUT_FOLDER = "/home/zhangchi/Github-C/" #Folder where ZIP files will be stored
+OUTPUT_CSV_FILE = "/home/zhangchi/Github-C/repositories.csv" #Path to the CSV file generated as output
 
 
 #############
@@ -42,7 +42,7 @@ OUTPUT_CSV_FILE = "/media/ruben/mydisk/Documents/PhD/Energy/Nexus4/Dictionaries/
 
 def getUrl (url) :
 	''' Given a URL it returns its body '''
-	buffer = StringIO()
+	buffer = io.StringIO()
 	c = pycurl.Curl()
 	c.setopt(c.URL, url)
 	c.setopt(c.WRITEDATA, buffer)
@@ -66,7 +66,8 @@ repositories = csv.writer(csvfile, delimiter=',')
 
 #Run queries to get information in json format and download ZIP file for each repository
 for subquery in range(1, len(SUBQUERIES)+1):
-	print "Processing subquery " + str(subquery) + " of " + str(len(SUBQUERIES)) + " ..."
+	#print "Processing subquery " + str(subquery) + " of " + str(len(SUBQUERIES)) + " ..."
+	print("Processing subquery %d of %d ..." %(subquery, len(SUBQUERIES)))
 	
 	#Obtain the number of pages for the current subquery (by default each page contains 100 items)
 	url = URL + QUERY + str(SUBQUERIES[subquery-1]) + PARAMETERS			
@@ -75,7 +76,8 @@ for subquery in range(1, len(SUBQUERIES)+1):
 
 	#Results are in different pages
 	for currentPage in range(1, numberOfPages+1):
-		print "Processing page " + str(currentPage) + " of " + str(numberOfPages) + " ..."
+		#print "Processing page " + str(currentPage) + " of " + str(numberOfPages) + " ..."
+		print("Processing page %d of %d ..." %(currentPage, numberOfPages))
 		url = URL + QUERY + str(SUBQUERIES[subquery-1]) + PARAMETERS + "&page=" + str(currentPage)					
 		dataRead = simplejson.loads(getUrl(url))
 		
@@ -98,8 +100,10 @@ for subquery in range(1, len(SUBQUERIES)+1):
 
 	#A delay between different subqueries
 	if (subquery < len(SUBQUERIES)):
-		print "Sleeping " + str(DELAY_BETWEEN_QUERYS) + " seconds before the new query ..."
+		#print "Sleeping " + str(DELAY_BETWEEN_QUERYS) + " seconds before the new query ..."
+		print("Sleeping %d seconds before the new query ..." %DELAY_BETWEEN_QUERYS)
 		time.sleep(DELAY_BETWEEN_QUERYS)
 
-print "DONE! " + str(countOfRepositories) + " repositories have been processed."
+#print "DONE! " + str(countOfRepositories) + " repositories have been processed."
+print("DONE! %d repositories have been processed." %countOfRepositories)
 csvfile.close()
