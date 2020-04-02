@@ -128,23 +128,24 @@ def downProj ():
 				if os.path.exists(OUTPUT_FOLDER + fileName):
 					countOfRepositories = countOfRepositories + 1
 					continue
-				f.write("user: " + user + "; repository: " + repository + "\n")
 
 				print("download url: " + fileToDownload)
 
 				try:
 					wget.download(fileToDownload, out=OUTPUT_FOLDER + fileName)
 				except:
+					continue
 					#https://github.com/antirez/redis/archive/unstable.zip
-					try:
-						fileToDownload = url[0:len(url)-4] + "/archive/unstable.zip"
-						wget.download(fileToDownload, out=OUTPUT_FOLDER + fileName)
-					except Exception as e:
-						ef = open(OUTPUT_TXT_FILE + "error.txt", "a+")
-						ef.write(e)
-						ef.close()
+					#try:
+					#	fileToDownload = url[0:len(url)-4] + "/archive/unstable.zip"
+					#	wget.download(fileToDownload, out=OUTPUT_FOLDER + fileName)
+					#except Exception as e:
+					#	ef = open(OUTPUT_TXT_FILE + "error.txt", "a+")
+					#	ef.write(e)
+					#	ef.close()
 							
 				#Update repositories counter
+				f.write("user: " + user + "; repository: " + repository + "\n")
 				countOfRepositories = countOfRepositories + 1
 
 		#A delay between different subqueries
