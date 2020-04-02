@@ -116,7 +116,7 @@ def downProj ():
 				#Obtain user and repository names
 				user = item['owner']['login']
 				repository = item['name']
-				f.write("user: " + user + "; repository: " + repository + "\n")
+				#f.write("user: " + user + "; repository: " + repository + "\n")
 				print(user, ' ', repository)
 			
 				#Download the zip file of the current project				
@@ -128,6 +128,7 @@ def downProj ():
 				if os.path.exists(OUTPUT_FOLDER + fileName):
 					countOfRepositories = countOfRepositories + 1
 					continue
+				f.write("user: " + user + "; repository: " + repository + "\n")
 
 				print("download url: " + fileToDownload)
 
