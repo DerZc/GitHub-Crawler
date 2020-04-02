@@ -53,7 +53,12 @@ def getUrl (url) :
 	c = pycurl.Curl()
 	c.setopt(c.URL, url)
 	c.setopt(c.WRITEDATA, buffer)
-	c.perform()
+	try:
+		c.perform()
+	except Exception as e:
+		print(e)
+		time.sleep(DELAY_BETWEEN_QUERYS)
+		c.perform()
 	c.close()
 	body = buffer.getvalue().decode('utf-8')
 
