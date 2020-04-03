@@ -161,7 +161,7 @@ def downProj ():
 		#if (subquery < len(SUBQUERIES)):
 			#print "Sleeping " + str(DELAY_BETWEEN_QUERYS) + " seconds before the new query ..."
 			#print("Sleeping %d seconds before the new query ..." %DELAY_BETWEEN_QUERYS)
-		print "Sleeping " + str(DELAY_BETWEEN_QUERYS) + " seconds before the new query ..."
+		print("Sleeping %d seconds before the new query ..." %DELAY_BETWEEN_QUERYS)
 		time.sleep(DELAY_BETWEEN_QUERYS)
 
 	#print "DONE! " + str(countOfRepositories) + " repositories have been processed."
