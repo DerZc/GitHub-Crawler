@@ -115,6 +115,7 @@ def downProj ():
 					time.sleep(DELAY_BETWEEN_QUERYS)
 					return 1
 		
+			print(dataRead)
 			#Iteration over all the repositories in the current json content page
 			for item in dataRead['items']:
 				#Obtain user and repository names
@@ -157,10 +158,11 @@ def downProj ():
 				countOfRepositories = countOfRepositories + 1
 
 		#A delay between different subqueries
-		if (subquery < len(SUBQUERIES)):
+		#if (subquery < len(SUBQUERIES)):
 			#print "Sleeping " + str(DELAY_BETWEEN_QUERYS) + " seconds before the new query ..."
-			print("Sleeping %d seconds before the new query ..." %DELAY_BETWEEN_QUERYS)
-			time.sleep(DELAY_BETWEEN_QUERYS)
+			#print("Sleeping %d seconds before the new query ..." %DELAY_BETWEEN_QUERYS)
+		print "Sleeping " + str(DELAY_BETWEEN_QUERYS) + " seconds before the new query ..."
+		time.sleep(DELAY_BETWEEN_QUERYS)
 
 	#print "DONE! " + str(countOfRepositories) + " repositories have been processed."
 	print("DONE! %d repositories have been processed." %countOfRepositories)
