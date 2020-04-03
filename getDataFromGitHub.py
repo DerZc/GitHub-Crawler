@@ -33,14 +33,16 @@ except ImportError:
 # Constants #
 #############
 
-URL = "https://api.github.com/search/repositories?q=" #The basic URL to use the GitHub API
+ACCESS_TOKEN = "2c972e55d6bcb76c0dcb957e98a2e7437d551e49"
+URL = "https://api.github.com/search/repositories?access_token=" + ACCESS_TOKEN + "&q=" #The basic URL to use the GitHub API
 QUERY = "user:DerZc+" #The personalized query (for instance, to get repositories from user 'rsain')
 SUBQUERIES = ["language:C+language:cpp+stars:>=50"] #Different subqueries if you need to collect more than 1000 elements
 PARAMETERS = "&per_page=100" #Additional parameters for the query (by default 100 items per page)
 DELAY_BETWEEN_QUERYS = 10 #The time to wait between different queries to GitHub (to avoid be banned)
 OUTPUT_FOLDER = "/home/zhangchi/Github-C/" #Folder where ZIP files will be stored
 OUTPUT_TXT_FILE = "/home/zhangchi/Github-C/" #Path to the txt file generated as output
-MINIMUM_PROJECT_NUM = 1000 #The minimum num of projects
+MINIMUM_PROJECT_NUM = 10000 #The minimum num of projects
+
 
 
 #############
@@ -156,6 +158,7 @@ def downProj ():
 				#Update repositories counter
 				f.write("user: " + user + "; repository: " + repository + "\n")
 				countOfRepositories = countOfRepositories + 1
+			time.sleep(60)
 
 		#A delay between different subqueries
 		#if (subquery < len(SUBQUERIES)):
