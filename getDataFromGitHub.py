@@ -117,7 +117,7 @@ def downProj ():
 					time.sleep(DELAY_BETWEEN_QUERYS)
 					return 1
 		
-			print(dataRead)
+			#print(dataRead)
 			#Iteration over all the repositories in the current json content page
 			for item in dataRead['items']:
 				#Obtain user and repository names
