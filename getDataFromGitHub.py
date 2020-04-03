@@ -100,7 +100,7 @@ def downProj ():
 		numberOfPages = int(math.ceil(dataRead.get('total_count')/100.0))
 
 		#Results are in different pages
-		for currentPage in range(1, numberOfPages+1):
+		for currentPage in range(1, 11):
 			#print "Processing page " + str(currentPage) + " of " + str(numberOfPages) + " ..."
 			print("Processing page %d of %d ..." %(currentPage, numberOfPages))
 			#url = URL + QUERY + str(SUBQUERIES[subquery-1]) + PARAMETERS + "&page=" + str(currentPage)	
