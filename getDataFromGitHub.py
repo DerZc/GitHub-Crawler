@@ -33,7 +33,7 @@ except ImportError:
 # Constants #
 #############
 
-ACCESS_TOKEN = "2c972e55d6bcb76c0dcb957e98a2e7437d551e49"
+ACCESS_TOKEN = ""
 URL = "https://api.github.com/search/repositories?access_token=" + ACCESS_TOKEN + "&q=" #The basic URL to use the GitHub API
 QUERY = "user:DerZc+" #The personalized query (for instance, to get repositories from user 'rsain')
 SUBQUERIES = ["language:C+language:cpp+stars:>=50"] #Different subqueries if you need to collect more than 1000 elements
@@ -158,7 +158,6 @@ def downProj ():
 				#Update repositories counter
 				f.write("user: " + user + "; repository: " + repository + "\n")
 				countOfRepositories = countOfRepositories + 1
-			time.sleep(60)
 
 		#A delay between different subqueries
 		#if (subquery < len(SUBQUERIES)):
