@@ -72,18 +72,21 @@ def getUrl (url) :
 def downProj ():
 	#To save the number of repositories processed
 	countOfRepositories = 0
+	currentMaxStars = 200000
 
 	#Output CSV file which will contain information about repositories
 	f = open(OUTPUT_TXT_FILE + "repositories.txt", "a+")
 
 	#Run queries to get information in json format and download ZIP file for each repository
-	for subquery in range(1, len(SUBQUERIES)+1):
+	#for subquery in range(1, len(SUBQUERIES)+1):
+	while currentMaxStars > 50:
 		#print "Processing subquery " + str(subquery) + " of " + str(len(SUBQUERIES)) + " ..."
-		print("Processing subquery %d of %d ..." %(subquery, len(SUBQUERIES)))
+		#print("Processing subquery %d of %d ..." %(subquery, len(SUBQUERIES)))
 	
 		#Obtain the number of pages for the current subquery (by default each page contains 100 items)
 		#url = URL + QUERY + str(SUBQUERIES[subquery-1]) + PARAMETERS			
-		url = URL + str(SUBQUERIES[subquery-1]) + PARAMETERS	
+		#url = URL + str(SUBQUERIES[subquery-1]) + PARAMETERS	
+		url = URL + "language:C+language:cpp+stars:50.." + str(currentMaxStars) +  PARAMETERS
 
 		print("query url: ", url)
 		try:
@@ -99,7 +102,8 @@ def downProj ():
 			#print "Processing page " + str(currentPage) + " of " + str(numberOfPages) + " ..."
 			print("Processing page %d of %d ..." %(currentPage, numberOfPages))
 			#url = URL + QUERY + str(SUBQUERIES[subquery-1]) + PARAMETERS + "&page=" + str(currentPage)	
-			url = URL + str(SUBQUERIES[subquery-1]) + PARAMETERS + "&page=" + str(currentPage)
+			#url = URL + str(SUBQUERIES[subquery-1]) + PARAMETERS + "&page=" + str(currentPage)
+			url = URL + "language:C+language:cpp+stars:50.." + str(currentMaxStars) +  PARAMETERS + "&page=" + str(currentPage)
 			print("current page url: ", url)
 			try:
 				dataRead = simplejson.loads(getUrl(url))
@@ -116,8 +120,12 @@ def downProj ():
 				#Obtain user and repository names
 				user = item['owner']['login']
 				repository = item['name']
+				stargazers_count = item['stargazers_count']
+				if currentPage == 10 :
+					currentMaxStars = int(stargazers_count)
+				#print(stargazers_count)
 				#f.write("user: " + user + "; repository: " + repository + "\n")
-				print(user, ' ', repository)
+				#print(user, ' ', repository)
 			
 				#Download the zip file of the current project				
 				print ("Downloading repository '%s' from user '%s' ..." %(repository,user))
